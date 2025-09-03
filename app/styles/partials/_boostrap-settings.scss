@@ -1,0 +1,48 @@
+$grid-columns: 48;
+
+$grid-gutter-width: 0;
+
+$spacer: 4px;
+
+$spacers: (
+	0: 0,
+	1: 4px,
+	2: 8px,
+	3: 12px,
+	4: 16px,
+	5: 20px,
+	6: 24px,
+	7: 28px,
+	8: 34px,
+	9: 48px,
+	10: 60px,
+	11: 70px,
+	12: 104px,
+	13: 140px,
+	14: 160px,
+	15: 200px,
+	16: 240px
+);
+
+$grid-breakpoints: (
+	xs: 0,
+	sm: 576px,
+	md: 768px,
+	lg: 992px,
+	xl: 1200px,
+	xxl: 1400px
+);
+
+$container-max-widths: (
+	sm: 540px,
+	md: 720px,
+	lg: 940px,
+	xl: 1000px,
+	xxl: 1140px
+);
+
+@include xs_sm {
+	.container {
+		max-width: calc(100% - 50px);
+	}
+}

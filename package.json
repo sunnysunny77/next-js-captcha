@@ -1,0 +1,36 @@
+{
+  "name": "app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "dev-https": "next dev --experimental-https",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@ducanh2912/next-pwa": "latest",
+    "@popperjs/core": "latest",
+    "@tensorflow/tfjs": "latest",
+    "@tensorflow/tfjs-node": "latest",
+    "bootstrap": "^5.3.5",
+    "next": "latest",
+    "overlayscrollbars": "latest",
+    "react": "latest",
+    "react-bootstrap-icons": "latest",
+    "react-dom": "latest"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "latest",
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "eslint": "latest",
+    "eslint-config-next": "latest",
+    "sass": "^1.64.0",
+    "sass-loader": "^12.6.0",
+    "typescript": "latest",
+    "webpack": "latest"
+  }
+}
