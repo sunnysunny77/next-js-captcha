@@ -154,7 +154,11 @@ const Captcha = () => {
 
       <div className="label-grid">
 
-        {labels.map((label, i) => (<div role="alert" key={i}>{label}</div>))}
+        {[...Array(4)].map((_, i) => (
+
+          <div role="alert" key={i}>{labels[i] ?? ""}</div>
+
+        ))}
 
       </div>
 
