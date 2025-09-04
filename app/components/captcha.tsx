@@ -156,7 +156,7 @@ const Captcha = () => {
 
         {[...Array(4)].map((_, i) => (
 
-          <div role="alert" key={i}>{labels[i] ?? ""}</div>
+          <div key={i}>{labels[i] ?? ""}</div>
 
         ))}
 
