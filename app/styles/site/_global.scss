@@ -1,16 +1,15 @@
 html {
-    -webkit-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-    margin: 0;
-    font-family: var(--font-poppins);
-    overflow: hidden;
-    min-height: 200dvh;
+  margin: 0;
+  font-family: var(--font-poppins);
+  overflow: hidden;
 }
 
 .PreText {
-    white-space: pre-line;
+  white-space: pre-line;
 }
 
 .os-theme-body {
@@ -31,7 +30,7 @@ h1 {
   font-size: clamp(17px, 2.5vw, 19px);
 }
 
-.container {
+.hr-container {
   max-width: 280px;
   margin: 2rem auto;
   padding: 1rem;
@@ -116,41 +115,6 @@ h1 {
   margin: 1px;
 }
 
-.buttons {
-  display: flex;
-  gap: 1rem;
-  width: 100%;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-button {
-  flex: 1;
-  padding: 0.75rem 1.5rem;
-  background-color: #4a90e2;
-  border: none;
-  border-radius: 8px;
-  color: white;
-  font-weight: 600;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.25s ease;
-
-  &:hover,
-  &:focus {
-    background-color: #357abd;
-    outline: none;
-  }
-
-  &:active {
-    background-color: #2a5d8f;
-  }
-}
-
-#prediction {
-  font-size: 1.25rem;
-  font-weight: 700;
-  min-height: 2rem;
-  text-align: center;
-  letter-spacing: 0.05em;
+.button {
+  width: 80px;
 }

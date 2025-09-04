@@ -13,7 +13,7 @@ const Captcha = () => {
   const drawingRef = useRef([false, false, false, false]);
 
   const [labels, setLabels] = useState([]);
-  const [message, setMessage] = useState("Loading model...");
+  const [message, setMessage] = useState("Loading model");
   const [disabled, setDisabled] = useState(false);
 
   const setRandomLabels = async () => {
@@ -113,7 +113,7 @@ const Captcha = () => {
   const handleSubmit = async () => {
     try {
       setDisabled(true);
-      setMessage("Checking...");
+      setMessage("Checking");
 
       const images = canvasesRef.current.map(c => c.toDataURL("image/png").split(",")[1]);
       const results = await getClassify(images);
@@ -131,9 +131,9 @@ const Captcha = () => {
 
   return (
 
-    <div className="container" id="container">
+    <div className="hr-container" id="container">
 
-      <h1>Handwritten recognition</h1>
+      <h1 className="text-center">Handwritten recognition</h1>
 
       <div ref={quadRef} id="canvas-wrapper">
 
@@ -144,21 +144,21 @@ const Captcha = () => {
 
       </div>
 
-      <div className="buttons">
+      <div className="d-flex flex-wrap justify-content-center">
 
-        <button onClick={() => clear("Draw the required characters", true)}>Reset</button>
+        <button className="btn btn-success m-2 button" onClick={() => clear("Draw the required characters", true)}>Reset</button>
 
-        <button disabled={disabled} onClick={handleSubmit} ref={predictBtnRef}>Submit</button>
+        <button className="btn btn-success m-2 button" disabled={disabled} onClick={handleSubmit} ref={predictBtnRef}>Submit</button>
 
       </div>
 
       <div className="label-grid">
 
-        {labels.map((label, i) => (<div key={i}>{label}</div>))}
+        {labels.map((label, i) => (<div role="alert" key={i}>{label}</div>))}
 
       </div>
 
-      <div>{message}</div>
+      <div className="text-center alert alert-success p-2 w-100" role="alert">{message}</div>
 
     </div>
 
