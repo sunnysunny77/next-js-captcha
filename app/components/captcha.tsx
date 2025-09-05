@@ -152,13 +152,13 @@ const Captcha = () => {
 
       </div>
 
-      <div className="label-grid">
+      <div className="output-container">
 
-        {[...Array(4)].map((_, i) => (
+        <div className="label-grid">
 
-          <div key={i}>{labels[i] ?? ""}</div>
+          {labels.map((label, i) => (<img key={i} src={label} alt="label" />))}
 
-        ))}
+        </div>
 
       </div>
 

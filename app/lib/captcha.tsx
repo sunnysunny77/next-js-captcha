@@ -1,8 +1,23 @@
 "use server";
 import * as tf from "@tensorflow/tfjs-node";
 import path from "path";
+import {createCanvas} from "canvas";
 
-const labels: string[] = ["0","1","2","3","4","5","6","7","8","9"];
+const labels: string[] = [
+  "A","B","C","D","E","F","G","H","I","J","K","L","M",
+  "N","O","P","Q","R","S","T","U","V","W","X","Y","Z"
+];
+
+const phoneticLabels = {
+  "A": "ALPHA",   "B": "BRAVO",   "C": "CHARLIE", "D": "DELTA",
+  "E": "ECHO",    "F": "FOXTROT", "G": "GOLF",    "H": "HOTEL",
+  "I": "INDIA",   "J": "JULIET",  "K": "KILO",    "L": "LIMA",
+  "M": "MIKE",    "N": "NOVEMBER","O": "OSCAR",   "P": "PAPA",
+  "Q": "QUEBEC",  "R": "ROMEO",   "S": "SIERRA",  "T": "TANGO",
+  "U": "UNIFORM", "V": "VICTOR",  "W": "WHISKEY", "X": "XRAY",
+  "Y": "YANKEE",  "Z": "ZULU"
+};
+
 let currentLabels: string[] = [];
 let model: tf.GraphModel | null = null;
 
@@ -14,12 +29,77 @@ const loadModel = async (): Promise<void> => {
   }
 };
 
+const drawPhoneticLabel = (label) => {
+  const word = phoneticLabels[label];
+  const canvasSize = 122;
+  const canvas = createCanvas(canvasSize, canvasSize);
+  const ctx = canvas.getContext("2d");
+
+  ctx.fillStyle = "white";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const dotCount = 100;
+  for (let i = 0; i < dotCount; i++) {
+    const r = Math.floor(Math.random() * 256);
+    const g = Math.floor(Math.random() * 256);
+    const b = Math.floor(Math.random() * 256);
+    const alpha = Math.random() < 0.5 ? 0.3 : 0.8;
+    const radius = Math.random() * 3 + 1;
+    ctx.fillStyle = `rgba(${r},${g},${b},${alpha})`;
+    ctx.beginPath();
+    ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height, radius, 0, 2 * Math.PI);
+    ctx.fill();
+  }
+
+  ctx.strokeStyle = "rgba(0,0,0,0.2)";
+  ctx.lineWidth = 0.5;
+  for (let j = 0; j < 2; j++) {
+    ctx.beginPath();
+    ctx.moveTo(0, Math.random() * canvas.height);
+    for (let x = 0; x < canvas.width; x += 5) {
+      ctx.lineTo(
+        x,
+        (canvas.height / 2) + Math.sin(x / 5 + Math.random() * 2) * 12 + (Math.random() * 20 - 10)
+      );
+    }
+    ctx.stroke();
+  }
+
+  const fontSize = 18;
+  ctx.font = `bold ${fontSize}px Sans`;
+
+  let totalWidth = 0;
+  for (let char of word) {
+    totalWidth += ctx.measureText(char).width * 0.8;
+  }
+
+  let x = (canvas.width - totalWidth) / 2;
+
+  for (let char of word) {
+    const angle = (Math.random() - 0.5) * 0.6;
+    const offsetY = (Math.random() - 0.5) * 18;
+    const color = `rgba(${Math.floor(Math.random() * 256)},${Math.floor(Math.random() * 256)},${Math.floor(Math.random() * 256)},1)`;
+
+    ctx.save();
+    ctx.fillStyle = color;
+    ctx.translate(x, canvas.height / 2 + offsetY);
+    ctx.rotate(angle);
+    ctx.fillText(char, 0, 0);
+    ctx.restore();
+
+    x += ctx.measureText(char).width * 0.8;
+  }
+
+  return canvas.toDataURL();
+};
+
 export const getLabels = async (): Promise<string[]> => {
   currentLabels = Array.from(
     { length: 4 },
     () => labels[Math.floor(Math.random() * labels.length)]
   );
-  return currentLabels;
+  const phoneticImages = currentLabels.map((label) => drawPhoneticLabel(label));
+  return phoneticImages; 
 };
 
 const processImageNode = async (imageBuffer: Buffer): Promise<number | null> => {

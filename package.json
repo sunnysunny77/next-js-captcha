@@ -15,6 +15,7 @@
     "@tensorflow/tfjs": "latest",
     "@tensorflow/tfjs-node": "latest",
     "bootstrap": "^5.3.5",
+    "canvas": "^3.2.0",
     "next": "latest",
     "overlayscrollbars": "latest",
     "react": "latest",

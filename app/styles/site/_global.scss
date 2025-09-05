@@ -93,28 +93,35 @@ h1 {
   z-index: 2;
 }
 
+.output-container {
+  padding: 50%;
+  position: relative;
+  max-width: 204px;
+}
+
 .label-grid {
-  display: flex;
-  flex-wrap: wrap;
-  width: 100%;
-  max-width: 140px;
   font-weight: bold;
   font-size: 1.2em;
   color: white;
-}
-
-.label-grid > div {
-  border: 2px solid gray;
+  border: 2px solid grey;
+  background-color: white;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: black;
-  width: calc(50% - 2px);
-  height: 50px;
-  box-sizing: border-box;
-  margin: 1px;
+  flex-wrap: wrap;
+  img {
+    width: 50%;
+  }
 }
 
 .button {
   width: 80px;
+}
+
+.alert-success {
+  font-size: 15px;
 }
