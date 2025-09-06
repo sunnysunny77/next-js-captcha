@@ -56,8 +56,8 @@ h1 {
   image-rendering: pixelated;
   width: 50%;
   height: 50%;
- --stroke-color: #{$white};
- background-color: $bravo;
+  --stroke-color: #{$white};
+  background-color: $bravo;
 }
 
 #canvas-wrapper::after {
