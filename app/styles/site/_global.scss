@@ -28,22 +28,16 @@ body {
 
 h1 {
   font-size: clamp(17px, 2.5vw, 19px);
+  color: $white;
 }
 
 .hr-container {
   max-width: 280px;
   margin: 2rem auto;
   padding: 1rem;
-  background: #222;
   border-radius: 12px;
-  box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
-  color: white;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   user-select: none;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
+  background-color: $bravo;
 }
 
 #canvas-wrapper {
@@ -53,17 +47,17 @@ h1 {
   width: 100%;
   max-width: 280px;
   aspect-ratio: 1 / 1;
-  background: black;
 }
 
 #canvas-wrapper .quad {
   border: none;
-  background: black;
   touch-action: none;
   cursor: crosshair;
   image-rendering: pixelated;
   width: 50%;
   height: 50%;
+ --stroke-color: #{$white};
+ background-color: $bravo;
 }
 
 #canvas-wrapper::after {
@@ -97,14 +91,11 @@ h1 {
   padding: 25% 50%;
   position: relative;
   max-width: 204px;
+  border-radius: 5px;
+  overflow: hidden;
 }
 
 .label-grid {
-  font-weight: bold;
-  font-size: 1.2em;
-  color: white;
-  border: 2px solid grey;
-  background-color: white;
   position: absolute;
   top: 0;
   right: 0;
@@ -120,8 +111,9 @@ h1 {
 
 .button {
   width: 80px;
+  font-size: 12px;
 }
 
 .alert-success {
-  font-size: 15px;
+  font-size: 12px;
 }

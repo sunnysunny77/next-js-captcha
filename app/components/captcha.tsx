@@ -1,4 +1,5 @@
 "use client";
+import * as tf from "@tensorflow/tfjs";
 import {useEffect, useRef, useState} from "react";
 import {getLabels, getClassify} from "@/lib/captcha";
 
@@ -27,15 +28,12 @@ const Captcha = () => {
   };
 
   const clear = async (text, reset) => {
-    contextsRef.current.forEach(ctx => {
-      ctx.fillStyle = "black";
-      ctx.fillRect(0, 0, SIZE, SIZE);
-    });
+    contextsRef.current.forEach(ctx => ctx.clearRect(0, 0, SIZE, SIZE));
     if (reset) await setRandomLabels();
     setMessage(text);
-  };
+  }
 
-   const getCanvasCoords = (event, canvas) => {
+  const getCanvasCoords = (event, canvas) => {
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
@@ -63,7 +61,8 @@ const Captcha = () => {
         if (["mouse", "pen", "touch"].includes(event.pointerType)) {
           drawingRef.current[i] = true;
           const { x, y } = getCanvasCoords(event, canvas);
-          ctx.strokeStyle = "white";
+          const strokeColor = getComputedStyle(canvas).getPropertyValue('--stroke-color').trim();
+          ctx.strokeStyle = strokeColor || "black";
           ctx.lineWidth = Math.max(10, canvas.width / 16);
           ctx.lineCap = "round";
           ctx.lineJoin = "round";
@@ -114,12 +113,14 @@ const Captcha = () => {
     try {
       setDisabled(true);
       setMessage("Checking");
-
-      const images = canvasesRef.current.map(c => c.toDataURL("image/png").split(",")[1]);
-      const results = await getClassify(images);
-
-      let correct = results.every(prediction => prediction.predictedLabel === prediction.correctLabel);
-
+      const tensors = canvasesRef.current.map(canvas =>{
+          return tf.browser.fromPixels(canvas, 1).toFloat().div(255.0);
+        }
+      );
+      const tensorData = tensors.map(tensor => tensor.dataSync());
+      const results = await getClassify(tensorData);
+      tensors.forEach(tensor => tensor.dispose());
+      const correct = results.every(pred => pred.predictedLabel === pred.correctLabel);
       clear(correct ? "Correct" : "Incorrect", true);
     } catch (err) {
       console.error(err);
@@ -131,11 +132,11 @@ const Captcha = () => {
 
   return (
 
-    <div className="hr-container" id="container">
+    <div className="hr-container d-flex flex-column" id="container">
 
       <h1 className="text-center">Handwritten recognition</h1>
 
-      <div ref={quadRef} id="canvas-wrapper">
+      <div ref={quadRef} className="mb-4" id="canvas-wrapper">
 
         <canvas className="quad"></canvas>
         <canvas className="quad"></canvas>
@@ -144,7 +145,7 @@ const Captcha = () => {
 
       </div>
 
-      <div className="d-flex flex-wrap justify-content-center">
+      <div className="d-flex flex-wrap justify-content-center mb-4">
 
         <button className="btn btn-success m-2 button" onClick={() => clear("Draw a capital letter in the boxes", true)}>Reset</button>
 
@@ -152,7 +153,7 @@ const Captcha = () => {
 
       </div>
 
-      <div className="output-container">
+      <div className="output-container mb-3">
 
         <div className="label-grid">
 
@@ -162,7 +163,7 @@ const Captcha = () => {
 
       </div>
 
-      <div className="text-center alert alert-success p-2 w-100" role="alert">{message}</div>
+      <div className="text-center alert alert-success p-2 w-100 mb-0" role="alert">{message}</div>
 
     </div>
 

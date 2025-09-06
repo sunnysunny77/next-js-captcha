@@ -50,7 +50,7 @@ const drawPhoneticLabel = (label) => {
     ctx.fill();
   }
 
-  ctx.strokeStyle = "rgba(0,0,0,0.2)";
+  ctx.strokeStyle = "rgba(0,0,0,0.34)";
   ctx.lineWidth = 0.5;
   for (let j = 0; j < 2; j++) {
     ctx.beginPath();
@@ -86,7 +86,8 @@ const drawPhoneticLabel = (label) => {
     ctx.fillText(char, 0, 0);
     ctx.restore();
 
-    x += ctx.measureText(char).width * 0.8;
+    const overlap = -ctx.measureText(char).width * 0.125;
+    x += ctx.measureText(char).width * 0.8 + overlap;
   }
 
   return canvas.toDataURL();
@@ -101,15 +102,15 @@ export const getLabels = async (): Promise<string[]> => {
   return phoneticImages; 
 };
 
-const processImageNode = async (imageBuffer: Buffer): Promise<number | null> => {
+const processImageNode = async (imgArray) => {
 
-  let img = tf.node.decodeImage(imageBuffer, 3).toFloat().div(255.0);
+  const tensor = tf.tensor(imgArray, [140, 140, 1]);
 
-  const mask = img.greater(0.1);
+  const mask = tensor.greater(0.1);
   const coords = await tf.whereAsync(mask);
 
   if (coords.shape[0] === 0) {
-    img.dispose();
+    tensor.dispose();
     mask.dispose();
     coords.dispose();
     return null;
@@ -126,56 +127,48 @@ const processImageNode = async (imageBuffer: Buffer): Promise<number | null> => 
   const width: number = maxX - minX + 1;
   const height: number = maxY - minY + 1;
 
-  let imgTensor = img.mean(2).expandDims(2);
-  img.dispose();
-  mask.dispose();
-  coords.dispose();
-  ys.dispose();
-  xs.dispose();
-
-  imgTensor = imgTensor.slice([minY, minX, 0], [height, width, 1]);
+  const sliced = tensor.slice([minY, minX, 0], [height, width, 1]);
 
   const scale: number = 20 / Math.max(height, width);
   const newHeight: number = Math.round(height * scale);
   const newWidth: number = Math.round(width * scale);
-  imgTensor = imgTensor.resizeBilinear([newHeight, newWidth]);
+  const resized = sliced.resizeBilinear([newHeight, newWidth]);
 
   const top: number = Math.floor((28 - newHeight) / 2);
   const bottom: number = 28 - newHeight - top;
   const left: number = Math.floor((28 - newWidth) / 2);
   const right: number = 28 - newWidth - left;
+  const input = resized.pad([[top, bottom], [left, right], [0, 0]]).expandDims(0);
 
-  imgTensor = imgTensor
-    .pad([[top, bottom], [left, right], [0, 0]])
-    .expandDims(0);
+  const prediction = model.predict(input) as tf.Tensor;
+  const maxIndex = prediction.argMax(-1).dataSync()[0];
 
-  const prediction = model!.predict(imgTensor) as tf.Tensor;
-  const maxIndex: number = prediction.argMax(-1).dataSync()[0];
-
+  tensor.dispose();
+  mask.dispose();
+  coords.dispose();
+  ys.dispose();
+  xs.dispose();
+  sliced.dispose();
+  resized.dispose();
+  input.dispose();
   prediction.dispose();
-  imgTensor.dispose();
 
   return maxIndex;
 };
 
-export const getClassify = async (
-  images: string[]
-): Promise<{ correctLabel: string; predictedLabel: string | null }[]> => {
+export const getClassify = async (tensorArrays) => {
   if (!model) await loadModel();
 
-  if (!currentLabels || currentLabels.length !== images.length) {
+  if (!currentLabels || currentLabels.length !== tensorArrays.length) {
     throw new Error("Server labels not set or mismatch");
   }
 
   return Promise.all(
-    images.map(async (base64, i) => {
-      const buffer = Buffer.from(base64, "base64");
-      const predIndex = await processImageNode(buffer);
-      const predLabel = predIndex !== null ? labels[predIndex] : null;
-
+    tensorArrays.map(async (index, i) => {
+      const predIndex = await processImageNode(index);
       return {
         correctLabel: currentLabels[i],
-        predictedLabel: predLabel,
+        predictedLabel: predIndex !== null ? labels[predIndex] : null,
       };
     })
   );
