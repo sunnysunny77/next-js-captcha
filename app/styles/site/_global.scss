@@ -88,9 +88,8 @@ h1 {
 }
 
 .output-container {
-  padding: 25% 50%;
+  aspect-ratio: 2 / 1;
   position: relative;
-  max-width: 204px;
   border-radius: 5px;
   overflow: hidden;
 }
