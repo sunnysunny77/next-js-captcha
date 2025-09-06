@@ -76,11 +76,11 @@ const drawPhoneticLabel = (label) => {
 
   ctx.font = font;
   let totalWidth = 0;
-  for (let char of word) {
+  for (const char of word) {
     totalWidth += ctx.measureText(char).width * 0.8;
   }
   let x = (canvas.width - totalWidth) / 2;
-  for (let char of word) {
+  for (const char of word) {
     const angle = (Math.random() - 0.5) * 0.6;
     const offsetY = (Math.random() - 0.5) * 18;
     const min = 50;
