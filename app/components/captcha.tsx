@@ -120,7 +120,7 @@ const Captcha = () => {
       setDisabled(true);
       setMessage("Checking");
       const tensors = canvasesRef.current.map(canvas =>{
-        let img = tf.browser.fromPixels(canvas, 1).toFloat().div(255.0);
+        const img = tf.browser.fromPixels(canvas, 1).toFloat().div(255.0);
         return INVERT ? tf.sub(1.0, img) : img;
       });
       const tensorData = tensors.map(tensor => ({

@@ -61,7 +61,7 @@ h1 {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background-image: linear-gradient(to right, gray 2px, transparent 2px), linear-gradient(to bottom, gray 2px, transparent 2px);
+  background-image: linear-gradient(to right, $charlie 2px, transparent 2px), linear-gradient(to bottom, $charlie 2px, transparent 2px);
   background-size: 50% 50%;
   z-index: 2;
 }
@@ -70,10 +70,10 @@ h1 {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background-image: linear-gradient(to right, transparent 50%, gray 2px, transparent 50%), linear-gradient(to bottom, transparent 50%, gray 2px, transparent 50%);
+  background-image: linear-gradient(to right, transparent 50%, $charlie 2px, transparent 50%), linear-gradient(to bottom, transparent 50%, $charlie 2px, transparent 50%);
   background-size: 100% 100%, 100% 100%;
-  border-right: 2px solid gray;
-  border-bottom: 2px solid gray;
+  border-right: 2px solid $charlie;
+  border-bottom: 2px solid $charlie;
   z-index: 2;
 }
 
