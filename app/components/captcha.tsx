@@ -117,7 +117,10 @@ const Captcha = () => {
           return tf.browser.fromPixels(canvas, 1).toFloat().div(255.0);
         }
       );
-      const tensorData = tensors.map(tensor => tensor.dataSync());
+      const tensorData = tensors.map(tensor => ({
+        data: Array.from(tensor.dataSync()),
+        shape: tensor.shape
+      }));
       const results = await getClassify(tensorData);
       tensors.forEach(tensor => tensor.dispose());
       const correct = results.every(pred => pred.predictedLabel === pred.correctLabel);

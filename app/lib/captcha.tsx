@@ -102,9 +102,9 @@ export const getLabels = async (): Promise<string[]> => {
   return phoneticImages; 
 };
 
-const processImageNode = async (imgArray) => {
+const processImageNode = async (data, shape) => {
 
-  const tensor = tf.tensor(imgArray, [140, 140, 1]);
+  const tensor = tf.tensor(data, shape);
 
   const mask = tensor.greater(0.1);
   const coords = await tf.whereAsync(mask);
@@ -165,7 +165,7 @@ export const getClassify = async (tensorArrays) => {
 
   return Promise.all(
     tensorArrays.map(async (index, i) => {
-      const predIndex = await processImageNode(index);
+      const predIndex = await processImageNode(index.data, index.shape);
       return {
         correctLabel: currentLabels[i],
         predictedLabel: predIndex !== null ? labels[predIndex] : null,
