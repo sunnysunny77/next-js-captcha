@@ -4,6 +4,7 @@ import {useEffect, useRef, useState} from "react";
 import {getLabels, getClassify} from "@/lib/captcha";
 
 const SIZE = 140;
+const INVERT = false;
 
 const Captcha = () => {
   const quadRef = useRef(null);
@@ -27,7 +28,14 @@ const Captcha = () => {
   };
 
   const clear = async (text, reset) => {
-    contextsRef.current.forEach(ctx => ctx.clearRect(0, 0, SIZE, SIZE));
+    contextsRef.current.forEach(ctx => {
+        if (INVERT) {
+          ctx.fillStyle = "white";
+          ctx.fillRect(0, 0, SIZE, SIZE);
+        } else {
+          ctx.clearRect(0, 0, SIZE, SIZE)
+        }
+    });
     if (reset) await setRandomLabels();
     setMessage(text);
   }
@@ -60,7 +68,7 @@ const Captcha = () => {
         if (["mouse", "pen", "touch"].includes(event.pointerType)) {
           drawingRef.current[i] = true;
           const { x, y } = getCanvasCoords(event, canvas);
-          ctx.strokeStyle = "white";
+          ctx.strokeStyle = INVERT ? "black" : "white";
           ctx.lineWidth = Math.max(10, canvas.width / 16);
           ctx.lineCap = "round";
           ctx.lineJoin = "round";
@@ -111,7 +119,10 @@ const Captcha = () => {
     try {
       setDisabled(true);
       setMessage("Checking");
-      const tensors = canvasesRef.current.map(canvas =>{return tf.browser.fromPixels(canvas, 1).div(255.0)});
+      const tensors = canvasesRef.current.map(canvas =>{
+        let img = tf.browser.fromPixels(canvas, 1).toFloat().div(255.0);
+        return INVERT ? tf.sub(1.0, img) : img;
+      });
       const tensorData = tensors.map(tensor => ({
         data: Array.from(new Uint8Array(tensor.mul(255).dataSync())),
         shape: tensor.shape
