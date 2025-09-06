@@ -6,7 +6,6 @@ import {getLabels, getClassify} from "@/lib/captcha";
 const SIZE = 140;
 
 const Captcha = () => {
-
   const quadRef = useRef(null);
   const predictBtnRef = useRef(null);
   const canvasesRef = useRef([]);
@@ -23,7 +22,7 @@ const Captcha = () => {
       setLabels(labels);
     } catch (err) {
       console.error(err);
-      setMessage("Error fetching labels");
+      setMessage("Error");
     }
   };
 
