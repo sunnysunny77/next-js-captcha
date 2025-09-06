@@ -31,19 +31,18 @@ const loadModel = async (): Promise<void> => {
 
 const drawPhoneticLabel = (label) => {
   const word = phoneticLabels[label];
-  const canvasSize = 122;
-  const canvas = createCanvas(canvasSize, canvasSize);
+  const canvas = createCanvas(122, 61);
   const ctx = canvas.getContext("2d");
 
   ctx.fillStyle = "white";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  const dotCount = 100;
+  const dotCount = 61;
   for (let i = 0; i < dotCount; i++) {
     const r = Math.floor(Math.random() * 256);
     const g = Math.floor(Math.random() * 256);
     const b = Math.floor(Math.random() * 256);
-    const alpha = Math.random() < 0.5 ? 0.3 : 0.8;
+    const alpha = Math.random() < 0.5 ? 0.3 : 0.6;
     const radius = Math.random() * 3 + 1;
     ctx.fillStyle = `rgba(${r},${g},${b},${alpha})`;
     ctx.beginPath();

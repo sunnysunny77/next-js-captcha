@@ -95,7 +95,7 @@ const Captcha = () => {
       handlers[i] = { onPointerDown, onPointerMove, onPointerUp };
     });
 
-    clear("Draw the required characters", true);
+    clear("Draw a capital letter in the boxes", true);
 
     return () => {
       canvasesRef.current.forEach((canvas, i) => {
@@ -120,7 +120,7 @@ const Captcha = () => {
 
       let correct = results.every(prediction => prediction.predictedLabel === prediction.correctLabel);
 
-      correct ? setMessage("Correct") : setMessage("Incorrect");
+      clear(correct ? "Correct" : "Incorrect", true);
     } catch (err) {
       console.error(err);
       setMessage("Error");
@@ -146,7 +146,7 @@ const Captcha = () => {
 
       <div className="d-flex flex-wrap justify-content-center">
 
-        <button className="btn btn-success m-2 button" onClick={() => clear("Draw the required characters", true)}>Reset</button>
+        <button className="btn btn-success m-2 button" onClick={() => clear("Draw a capital letter in the boxes", true)}>Reset</button>
 
         <button className="btn btn-success m-2 button" disabled={disabled} onClick={handleSubmit} ref={predictBtnRef}>Submit</button>
 
