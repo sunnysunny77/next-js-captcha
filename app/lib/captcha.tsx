@@ -110,7 +110,7 @@ export const getLabels = async (): Promise<string[]> => {
 };
 
 const processImageNode = async (data, shape) => {
-  const tensor = tf.tensor(data, shape);
+  const tensor = tf.tensor(data, shape, 'float32').div(255.0);
 
   const mask = tensor.greater(0.1);
   const coords = await tf.whereAsync(mask);

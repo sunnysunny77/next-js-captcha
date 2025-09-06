@@ -43,7 +43,7 @@ const Captcha = () => {
   };
 
   useEffect(() => {
-    canvasesRef.current = Array.from(quadRef!.current!.children);
+    canvasesRef.current = Array.from(document.querySelectorAll(".quad"));
     contextsRef.current = canvasesRef!.current.map(canvas => {
       canvas.width = SIZE;
       canvas.height = SIZE;
@@ -60,8 +60,7 @@ const Captcha = () => {
         if (["mouse", "pen", "touch"].includes(event.pointerType)) {
           drawingRef.current[i] = true;
           const { x, y } = getCanvasCoords(event, canvas);
-          const strokeColor = getComputedStyle(canvas).getPropertyValue('--stroke-color').trim();
-          ctx.strokeStyle = strokeColor || "black";
+          ctx.strokeStyle = "white";
           ctx.lineWidth = Math.max(10, canvas.width / 16);
           ctx.lineCap = "round";
           ctx.lineJoin = "round";
@@ -108,16 +107,13 @@ const Captcha = () => {
     };
   }, []);
 
-  const handleSubmit = async () => {
+   const handleSubmit = async () => {
     try {
       setDisabled(true);
       setMessage("Checking");
-      const tensors = canvasesRef.current.map(canvas =>{
-          return tf.browser.fromPixels(canvas, 1).toFloat().div(255.0);
-        }
-      );
+      const tensors = canvasesRef.current.map(canvas =>{return tf.browser.fromPixels(canvas, 1).div(255.0)});
       const tensorData = tensors.map(tensor => ({
-        data: Array.from(tensor.dataSync()),
+        data: Array.from(new Uint8Array(tensor.mul(255).dataSync())),
         shape: tensor.shape
       }));
       const results = await getClassify(tensorData);
@@ -140,10 +136,13 @@ const Captcha = () => {
 
       <div ref={quadRef} className="mb-4" id="canvas-wrapper">
 
+        <div className="before"></div>
         <canvas className="quad"></canvas>
         <canvas className="quad"></canvas>
         <canvas className="quad"></canvas>
         <canvas className="quad"></canvas>
+        <div className="after"></div>
+        <div className="fill"></div>
 
       </div>
 

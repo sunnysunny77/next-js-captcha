@@ -50,41 +50,40 @@ h1 {
 }
 
 #canvas-wrapper .quad {
-  border: none;
-  touch-action: none;
-  cursor: crosshair;
-  image-rendering: pixelated;
   width: 50%;
   height: 50%;
-  --stroke-color: #{$white};
-  background-color: $bravo;
+  cursor: crosshair;
+  image-rendering: pixelated;
+  background-color: transparent;
+  z-index: 1;
 }
 
-#canvas-wrapper::after {
-  content: "";
+#canvas-wrapper .after {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background-image:
-    linear-gradient(to right, gray 2px, transparent 2px), linear-gradient(to bottom, gray 2px, transparent 2px);
+  background-image: linear-gradient(to right, gray 2px, transparent 2px), linear-gradient(to bottom, gray 2px, transparent 2px);
   background-size: 50% 50%;
   z-index: 2;
 }
 
-#canvas-wrapper::before {
-  content: "";
+#canvas-wrapper .before {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background-image:
-    linear-gradient(to right, transparent 50%, gray 2px, transparent 50%),
-    linear-gradient(to bottom, transparent 50%, gray 2px, transparent 50%);
-  background-size:
-    100% 100%,
-    100% 100%;
+  background-image: linear-gradient(to right, transparent 50%, gray 2px, transparent 50%), linear-gradient(to bottom, transparent 50%, gray 2px, transparent 50%);
+  background-size: 100% 100%, 100% 100%;
   border-right: 2px solid gray;
   border-bottom: 2px solid gray;
   z-index: 2;
+}
+
+#canvas-wrapper .fill {
+  position: absolute;
+  background-color: $bravo;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .output-container {
