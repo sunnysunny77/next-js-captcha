@@ -88,7 +88,7 @@ const drawPhoneticLabel = (label) => {
     const r = Math.floor(Math.random() * (max - min) + min);
     const g = Math.floor(Math.random() * (max - min) + min);
     const b = Math.floor(Math.random() * (max - min) + min);
-    const color = `rgba(${r},${g},${b},1)`
+    const color = `rgba(${r},${g},${b},1)`;
     ctx.save();
     ctx.fillStyle = color;
     ctx.translate(x, canvas.height / 2 + offsetY);
@@ -110,7 +110,7 @@ export const getLabels = async (): Promise<string[]> => {
 };
 
 const processImageNode = async (data, shape) => {
-  const tensor = tf.tensor(data, shape, 'float32').div(255.0);
+  const tensor = tf.tensor(data, shape, "float32").div(255.0);
 
   const mask = tensor.greater(0.1);
   const coords = await tf.whereAsync(mask);

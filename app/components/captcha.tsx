@@ -132,7 +132,7 @@ const Captcha = () => {
 
     <div className="hr-container d-flex flex-column" id="container">
 
-      <h1 className="text-center">Handwritten recognition</h1>
+      <h1 className="text-center mb-2">Handwritten recognition</h1>
 
       <div ref={quadRef} className="mb-4" id="canvas-wrapper">
 
