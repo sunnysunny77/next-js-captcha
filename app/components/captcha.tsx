@@ -1,7 +1,9 @@
 "use client";
 import * as tf from "@tensorflow/tfjs";
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useRef, useState, useCallback} from "react";
 import {getLabels, getClassify} from "@/lib/captcha";
+import Image from "next/image";
+import Spinner from "@/images/spinner.gif";
 
 const SIZE = 140;
 const INVERT = false;
@@ -13,19 +15,19 @@ const Captcha = () => {
   const contextsRef = useRef([]);
   const drawingRef = useRef([false, false, false, false]);
 
-  const [labels, setLabels] = useState([]);
-  const [message, setMessage] = useState("Loading model");
+  const [labels, setLabels] = useState(null);
+  const [message, setMessage] = useState("Loading");
   const [disabled, setDisabled] = useState(false);
 
-  const setRandomLabels = async () => {
+  const setRandomLabels = useCallback( async () => {
     try {
-      const labels = await getLabels();
-      setLabels(labels);
+      const res = await getLabels();
+      setLabels(res);
     } catch (err) {
       console.error(err);
       setMessage("Error");
     }
-  };
+  },[]);
 
   const clear = async (text, reset) => {
     contextsRef.current.forEach(ctx => {
@@ -100,7 +102,8 @@ const Captcha = () => {
       handlers[i] = { onPointerDown, onPointerMove, onPointerUp };
     });
 
-    clear("Draw a capital letter in the boxes", true);
+    setRandomLabels();
+    setMessage("Draw a capital letter in the boxes");
 
     return () => {
       canvasesRef.current.forEach((canvas, i) => {
@@ -113,7 +116,7 @@ const Captcha = () => {
         );
       });
     };
-  }, []);
+  }, [setRandomLabels]);
 
    const handleSubmit = async () => {
     try {
@@ -127,9 +130,9 @@ const Captcha = () => {
         data: Array.from(new Uint8Array(tensor.mul(255).dataSync())),
         shape: tensor.shape
       }));
-      const results = await getClassify(tensorData);
+      const res = await getClassify(tensorData);
       tensors.forEach(tensor => tensor.dispose());
-      const correct = results.every(pred => pred.predictedLabel === pred.correctLabel);
+      const correct = res.every(r => r.correct);
       clear(correct ? "Correct" : "Incorrect", true);
     } catch (err) {
       console.error(err);
@@ -169,7 +172,7 @@ const Captcha = () => {
 
         <div className="label-grid">
 
-          {labels.map((label, i) => (<img key={i} src={label} alt="label" />))}
+          {labels ? labels.map((label, i) => (<Image key={i} width="125" height="60" src={label} alt="canvas"/>)): <Image className="spinner" width="250" height="125" src={Spinner} alt="spinner"/>}
 
         </div>
 

@@ -173,8 +173,7 @@ export const getClassify = async (tensorArrays) => {
     tensorArrays.map(async (index, i) => {
       const predIndex = await processImageNode(index.data, index.shape);
       return {
-        correctLabel: currentLabels[i],
-        predictedLabel: predIndex !== null ? labels[predIndex] : null,
+        correct: currentLabels[i] === labels[predIndex],
       };
     })
   );
