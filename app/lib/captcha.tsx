@@ -106,6 +106,7 @@ const drawPhoneticLabel = (label) => {
 export const getLabels = async (): Promise<string[]> => {
   currentLabels = Array.from({ length: 4 },() => labels[Math.floor(Math.random() * labels.length)]);
   const labelImages = currentLabels.map(label => drawPhoneticLabel(label));
+  
   return labelImages;
 };
 

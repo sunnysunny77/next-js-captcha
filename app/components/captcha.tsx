@@ -122,18 +122,24 @@ const Captcha = () => {
     try {
       setDisabled(true);
       setMessage("Checking");
+
       const tensors = canvasesRef.current.map(canvas =>{
         const img = tf.browser.fromPixels(canvas, 1).toFloat().div(255.0);
         return INVERT ? tf.sub(1.0, img) : img;
       });
+
       const tensorData = tensors.map(tensor => ({
         data: Array.from(new Uint8Array(tensor.mul(255).dataSync())),
         shape: tensor.shape
       }));
+
       const res = await getClassify(tensorData);
+
       tensors.forEach(tensor => tensor.dispose());
+
       const correct = res.every(r => r.correct);
       clear(correct ? "Correct" : "Incorrect", true);
+      
     } catch (err) {
       console.error(err);
       setMessage("Error");
@@ -172,7 +178,7 @@ const Captcha = () => {
 
         <div className="label-grid">
 
-          {labels ? labels.map((label, i) => (<Image key={i} width="125" height="60" src={label} alt="canvas"/>)): <Image className="spinner" width="250" height="125" src={Spinner} alt="spinner"/>}
+          {labels ? labels.map((label, i) => (<Image key={i} width="125" height="60" src={label} alt="canvas"/>)) : <Image className="spinner" width="250" height="125" src={Spinner} alt="spinner"/>}
 
         </div>
 
