@@ -69,7 +69,8 @@ const Captcha = () => {
           drawingRef.current[i] = true;
           const { x, y } = getCanvasCoords(event, canvas);
           ctx.strokeStyle = INVERT ? "black" : "white";
-          ctx.lineWidth = Math.max(10, canvas.width / 16);
+          const minDim = Math.min(canvas.width, canvas.height);
+          ctx.lineWidth = Math.max(1, Math.round(minDim / 18));
           ctx.lineCap = "round";
           ctx.lineJoin = "round";
           ctx.beginPath();
