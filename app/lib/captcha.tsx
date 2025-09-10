@@ -30,7 +30,7 @@ const loadModel = async (): Promise<void> => {
   }
 };
 
-const drawPhoneticLabel = (label) => {
+const drawPhoneticLabel = (index) => {
   const width = 122;
   const height = 61;
   const fill = "white";
@@ -39,9 +39,9 @@ const drawPhoneticLabel = (label) => {
   const lineWidth = 0.5;
   const fontSize = 18;
   const font = `bold ${fontSize}px Sans`;
-  const overlap = 0.05;
+  const spacing = 0.05;
+  const label = phoneticLabels[index]
 
-  const word = phoneticLabels[label];
   const canvas = createCanvas(width, height);
   const ctx = canvas.getContext("2d");
 
@@ -76,11 +76,17 @@ const drawPhoneticLabel = (label) => {
 
   ctx.font = font;
   let totalWidth = 0;
-  for (const char of word) {
-    totalWidth += ctx.measureText(char).width * 0.8;
+  const charWidths = [];
+  for (const char of label) {
+    const w = ctx.measureText(char).width;
+    charWidths.push(w);
+    totalWidth += w * (1 + spacing);
   }
-  let x = (canvas.width - totalWidth) / 2;
-  for (const char of word) {
+
+  let x = (width - totalWidth) / 2;
+
+  for (let i = 0; i < label.length; i++) {
+    const char = label[i];
     const angle = (Math.random() - 0.5) * 0.6;
     const offsetY = (Math.random() - 0.5) * 18;
     const min = 50;
@@ -88,26 +94,28 @@ const drawPhoneticLabel = (label) => {
     const r = Math.floor(Math.random() * (max - min) + min);
     const g = Math.floor(Math.random() * (max - min) + min);
     const b = Math.floor(Math.random() * (max - min) + min);
-    const color = `rgba(${r},${g},${b},1)`;
     ctx.save();
-    ctx.fillStyle = color;
-    ctx.translate(x, canvas.height / 2 + offsetY);
+    ctx.fillStyle = `rgba(${r},${g},${b},1)`;
+    ctx.translate(x, height / 2 + offsetY);
     ctx.rotate(angle);
     ctx.fillText(char, 0, 0);
     ctx.restore();
 
-    const overlapCalc = -ctx.measureText(char).width * overlap;
-    x += ctx.measureText(char).width * 0.8 + overlapCalc;
+    x += charWidths[i] * (1 + spacing);
   }
 
   return canvas.toDataURL();
 };
 
 export const getLabels = async (): Promise<string[]> => {
-  currentLabels = Array.from({ length: 4 },() => labels[Math.floor(Math.random() * labels.length)]);
-  const labelImages = currentLabels.map(label => drawPhoneticLabel(label));
-  
-  return labelImages;
+  try {
+    currentLabels = Array.from({ length: 4 },() => labels[Math.floor(Math.random() * labels.length)]);
+    const labelImages = currentLabels.map(label => drawPhoneticLabel(label));
+
+    return labelImages;
+  } catch (err) {
+    console.error(err);
+  }
 };
 
 const processImageNode = async (data, shape) => {
@@ -164,18 +172,22 @@ const processImageNode = async (data, shape) => {
 };
 
 export const getClassify = async (tensorArrays) => {
-  if (!model) await loadModel();
+  try {
+    if (!model) await loadModel();
 
-  if (!currentLabels || currentLabels.length !== tensorArrays.length) {
-    throw new Error("Error");
+    if (!currentLabels || currentLabels.length !== tensorArrays.length) {
+      throw new Error();
+    }
+
+    return Promise.all(
+      tensorArrays.map(async (index, i) => {
+        const predIndex = await processImageNode(index.data, index.shape);
+        return {
+          correct: currentLabels[i] === labels[predIndex],
+        };
+      })
+    );
+  } catch (err) {
+    console.error(err);
   }
-
-  return Promise.all(
-    tensorArrays.map(async (index, i) => {
-      const predIndex = await processImageNode(index.data, index.shape);
-      return {
-        correct: currentLabels[i] === labels[predIndex],
-      };
-    })
-  );
 };

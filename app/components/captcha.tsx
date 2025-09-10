@@ -29,7 +29,7 @@ const Captcha = () => {
     }
   },[]);
 
-  const clear = async (text, reset) => {
+  const clear = () => {
     contextsRef.current.forEach(ctx => {
         if (INVERT) {
           ctx.fillStyle = "white";
@@ -38,8 +38,6 @@ const Captcha = () => {
           ctx.clearRect(0, 0, SIZE, SIZE)
         }
     });
-    if (reset) await setRandomLabels();
-    setMessage(text);
   }
 
   const getCanvasCoords = (event, canvas) => {
@@ -118,7 +116,18 @@ const Captcha = () => {
     };
   }, [setRandomLabels]);
 
-   const handleSubmit = async () => {
+  const handleClear = async () => {
+    clear();
+    setMessage("Draw a capital letter in the boxes");
+  };
+
+  const handleReset = async () => {
+    await setRandomLabels();
+    clear();
+    setMessage("Draw a capital letter in the boxes");
+  };
+
+  const handleSubmit = async () => {
     try {
       setDisabled(true);
       setMessage("Checking");
@@ -137,8 +146,8 @@ const Captcha = () => {
 
       tensors.forEach(tensor => tensor.dispose());
 
-      const correct = res.every(r => r.correct);
-      clear(correct ? "Correct" : "Incorrect", true);
+      const correct = res.every(res => res.correct);
+      setMessage(correct ? "Correct" : "Incorrect");
       
     } catch (err) {
       console.error(err);
@@ -168,9 +177,9 @@ const Captcha = () => {
 
       <div className="d-flex flex-wrap justify-content-center mb-4">
 
-        <button className="btn btn-success m-2 button" onClick={() => clear("Draw a capital letter in the boxes", true)}>Reset</button>
+        <button className="btn btn-success m-2 button" onClick={handleReset}>New</button>
 
-        <button className="btn btn-success m-2 button" disabled={disabled} onClick={handleSubmit} ref={predictBtnRef}>Submit</button>
+        <button className="btn btn-success m-2 button" onClick={handleClear}>Clear</button>
 
       </div>
 
@@ -184,7 +193,13 @@ const Captcha = () => {
 
       </div>
 
-      <div className="text-center alert alert-success p-2 w-100 mb-0" role="alert">{message}</div>
+      <div className="text-center alert alert-success p-2 w-100 mb-3" role="alert">{message}</div>
+
+      <div className="d-flex flex-wrap justify-content-center">
+
+        <button className="btn btn-success w-100" disabled={disabled} onClick={handleSubmit} ref={predictBtnRef}>Send</button>
+
+      </div>
 
     </div>
 
