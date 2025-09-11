@@ -16,8 +16,13 @@ const Captcha = () => {
   const drawingRef = useRef([false, false, false, false]);
 
   const [labels, setLabels] = useState(null);
-  const [message, setMessage] = useState("Loading");
+  const [message, setMessage] = useState(null);
   const [disabled, setDisabled] = useState(false);
+
+  const imageLoader = ({src, width}) => {
+
+    return `${src}?w=${width}`;
+  };
 
   const setRandomLabels = useCallback( async () => {
     try {
@@ -131,7 +136,7 @@ const Captcha = () => {
   const handleSubmit = async () => {
     try {
       setDisabled(true);
-      setMessage("Checking");
+      setMessage(null);
 
       const tensors = canvasesRef.current.map(canvas =>{
         const img = tf.browser.fromPixels(canvas, 1).toFloat().div(255.0);
@@ -188,13 +193,17 @@ const Captcha = () => {
 
         <div className="label-grid">
 
-          {labels ? labels.map((label, i) => (<Image key={i} width="125" height="60" src={label} alt="canvas"/>)) : <Image className="spinner" width="250" height="125" src={Spinner} alt="spinner"/>}
+          {labels ? labels.map((label, i) => (<Image key={i} width="125" height="60" src={label} loader={imageLoader} alt="canvas"/>)) : <Image className="spinner" width="70" height="70" src={Spinner} loader={imageLoader} alt="spinner"/>}
 
         </div>
 
       </div>
 
-      <div className="text-center alert alert-success p-2 w-100 mb-3" role="alert">{message}</div>
+      <div className="text-center alert alert-success w-100 d-flex justify-content-center align-items-center p-0 mb-3" role="alert">
+
+        {message ? message : <Image width="30" height="30" src={Spinner} loader={imageLoader} unoptimized alt="spinner"/>}
+
+      </div>
 
       <div className="d-flex flex-wrap justify-content-center">
 
