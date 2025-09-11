@@ -193,7 +193,7 @@ const Captcha = () => {
 
         <div className="label-grid">
 
-          {labels ? labels.map((label, i) => (<Image key={i} width="125" height="60" src={label} loader={imageLoader} alt="canvas"/>)) : <Image className="spinner" width="70" height="70" src={Spinner} loader={imageLoader} alt="spinner"/>}
+          {labels ? labels.map((label, i) => (<Image key={i} width="125" height="60" src={label} loader={imageLoader} unoptimized alt="canvas"/>)) : <Image className="spinner" width="70" height="70" src={Spinner} loader={imageLoader} unoptimized alt="spinner"/>}
 
         </div>
 
