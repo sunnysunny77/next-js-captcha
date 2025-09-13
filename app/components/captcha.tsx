@@ -69,6 +69,13 @@ const Captcha = () => {
     canvasesRef.current.forEach((canvas, i) => {
       const ctx = contextsRef.current[i];
 
+      if (INVERT) {
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, SIZE, SIZE);
+      } else {
+        ctx.clearRect(0, 0, SIZE, SIZE);
+      }
+
       const onPointerDown = event => {
         if (["mouse", "pen", "touch"].includes(event.pointerType)) {
           drawingRef.current[i] = true;
