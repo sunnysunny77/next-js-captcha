@@ -2,6 +2,8 @@
 import * as tf from "@tensorflow/tfjs-node";
 import path from "path";
 import {createCanvas} from "canvas";
+import {cookies} from "next/headers";
+import crypto from "crypto";
 
 const labels: string[] = [
   "A","B","C","D","E","F","G","H","I","J","K","L","M",
@@ -17,8 +19,6 @@ const phoneticLabels = {
   "U": "UNIFORM", "V": "VICTOR",  "W": "WHISKEY", "X": "XRAY",
   "Y": "YANKEE",  "Z": "ZULU",
 };
-
-let currentLabels: string[] = [];
 
 let model: tf.GraphModel | null = null;
 
@@ -109,8 +109,12 @@ const drawPhoneticLabel = (index) => {
 
 export const getLabels = async (): Promise<string[]> => {
   try {
-    currentLabels = Array.from({ length: 4 },() => labels[Math.floor(Math.random() * labels.length)]);
+    const currentLabels = Array.from({ length: 4 },() => labels[Math.floor(Math.random() * labels.length)]);
     const labelImages = currentLabels.map(label => drawPhoneticLabel(label));
+    const secret = process.env.REACT_APP_AUTH_SECRET;
+    const hash = crypto.createHmac("sha256", secret).update(JSON.stringify(currentLabels)).digest("hex");
+    const cookieStore = await cookies();
+    cookieStore.set("App-Captcha", hash, {secure: true, httpOnly: true, sameSite: "strict"});
 
     return labelImages;
   } catch (err) {
@@ -175,18 +179,22 @@ export const getClassify = async (tensorArrays) => {
   try {
     if (!model) await loadModel();
 
-    if (!currentLabels || currentLabels.length !== tensorArrays.length) {
-      throw new Error();
-    }
-
-    return Promise.all(
-      tensorArrays.map(async (index, i) => {
-        const predIndex = await processImageNode(index.data, index.shape);
-        return {
-          correct: currentLabels[i] === labels[predIndex],
-        };
-      })
+    const results = await Promise.all(
+      tensorArrays.map(index => processImageNode(index.data, index.shape))
     );
+
+    const currentLabels = results.map(result => labels[result]);
+
+    const cookieStore = await cookies();
+    const storedHash = cookieStore.get("App-Captcha").value;
+    const secret = process.env.REACT_APP_AUTH_SECRET;
+    const incomingHash = crypto.createHmac("sha256", secret).update(JSON.stringify(currentLabels)).digest("hex");
+    const match = crypto.timingSafeEqual(
+      Buffer.from(incomingHash, "hex"),
+      Buffer.from(storedHash, "hex")
+    );
+
+    return { correct:  match };
   } catch (err) {
     console.error(err);
   }

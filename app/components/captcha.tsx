@@ -152,8 +152,7 @@ const Captcha = () => {
 
       tensors.forEach(tensor => tensor.dispose());
 
-      const correct = res.every(res => res.correct);
-      setMessage(correct ? "Correct" : "Incorrect");
+      setMessage(res.correct ? "Correct" : "Incorrect");
       
     } catch (err) {
       console.error(err);
