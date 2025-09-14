@@ -124,51 +124,10 @@ export const getLabels = async (): Promise<string[]> => {
 
 const processImageNode = async (data, shape) => {
   const tensor = tf.tensor(data, shape, "float32").div(255.0);
-
-  const mask = tensor.greater(0.1);
-  const coords = await tf.whereAsync(mask);
-
-  if (coords.shape[0] === 0) {
-    tensor.dispose();
-    mask.dispose();
-    coords.dispose();
-    return null;
-  }
-
-  const ys = coords.slice([0, 0], [-1, 1]).squeeze();
-  const xs = coords.slice([0, 1], [-1, 1]).squeeze();
-
-  const minY: number = ys.min().arraySync() as number;
-  const maxY: number = ys.max().arraySync() as number;
-  const minX: number = xs.min().arraySync() as number;
-  const maxX: number = xs.max().arraySync() as number;
-
-  const width: number = maxX - minX + 1;
-  const height: number = maxY - minY + 1;
-
-  const sliced = tensor.slice([minY, minX, 0], [height, width, 1]);
-
-  const scale: number = 20 / Math.max(height, width);
-  const newHeight: number = Math.round(height * scale);
-  const newWidth: number = Math.round(width * scale);
-  const resized = sliced.resizeBilinear([newHeight, newWidth]);
-
-  const top: number = Math.floor((28 - newHeight) / 2);
-  const bottom: number = 28 - newHeight - top;
-  const left: number = Math.floor((28 - newWidth) / 2);
-  const right: number = 28 - newWidth - left;
-  const input = resized.pad([[top, bottom], [left, right], [0, 0]]).expandDims(0);
-
+  const input = tensor.expandDims(0);
   const prediction = model.predict(input) as tf.Tensor;
   const maxIndex = prediction.argMax(-1).dataSync()[0];
-
   tensor.dispose();
-  mask.dispose();
-  coords.dispose();
-  ys.dispose();
-  xs.dispose();
-  sliced.dispose();
-  resized.dispose();
   input.dispose();
   prediction.dispose();
 

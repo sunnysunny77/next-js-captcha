@@ -140,14 +140,77 @@ const Captcha = () => {
     setMessage("Draw a capital letter in the boxes");
   };
 
+  const resizeCanvas = (imageData, canvas) => {
+    let minX = SIZE, minY = SIZE;
+    let maxX = 0, maxY = 0;
+
+    for (let y = 0; y < SIZE; y++) {
+      for (let x = 0; x < SIZE; x++) {
+        const idx = (y * SIZE + x) * 4;
+        if (imageData[idx] > 0) {
+          if (x < minX) minX = x;
+          if (x > maxX) maxX = x;
+          if (y < minY) minY = y;
+          if (y > maxY) maxY = y;
+        }
+      }
+    }
+
+    const boxWidth = maxX - minX + 1;
+    const boxHeight = maxY - minY + 1;
+    const scale = 20 / Math.max(boxWidth, boxHeight);
+    const dx = (28 - boxWidth * scale) / 2;
+    const dy = (28 - boxHeight * scale) / 2;
+
+    const resizedCanvas = document.createElement("canvas");
+    resizedCanvas.width = 28;
+    resizedCanvas.height = 28;
+    const resizedCtx = resizedCanvas.getContext("2d");
+
+    resizedCtx.drawImage(
+      canvas,
+      minX, minY, boxWidth, boxHeight,
+      dx, dy, boxWidth * scale, boxHeight * scale
+    );
+
+    return resizedCanvas;
+  };
+
+  const processCanvas = (image, obj, ctx) => {
+    if (INVERT) {
+      const invertedCanvas = document.createElement("canvas");
+      invertedCanvas.width = SIZE;
+      invertedCanvas.height = SIZE;
+      const invertedCtx = invertedCanvas.getContext("2d");
+      const invertedData = ctx.createImageData(image.width, image.height);
+      for (let i = 0; i < image.data.length; i += 4) {
+        invertedData.data[i]     = 255 - image.data[i];
+        invertedData.data[i + 1] = 255 - image.data[i + 1];
+        invertedData.data[i + 2] = 255 - image.data[i + 2];
+        invertedData.data[i + 3] = image.data[i + 3];
+      };
+      invertedCtx.putImageData(invertedData, 0, 0);
+
+      return { imageData: invertedCtx.getImageData(0, 0, SIZE, SIZE).data, canvas: invertedCanvas };
+    }
+
+    return { imageData:  image.data, canvas: obj };
+  };
+
   const handleSubmit = async () => {
     try {
       setDisabled(true);
       setMessage(null);
 
-      const tensors = canvasesRef.current.map(canvas =>{
-        const img = tf.browser.fromPixels(canvas, 1).toFloat().div(255.0);
-        return INVERT ? tf.sub(1.0, img) : img;
+      const canvases = canvasesRef.current.map((obj, i) => {
+        const ctx = contextsRef.current[i];
+        const image = ctx.getImageData(0, 0, SIZE, SIZE);
+        const { imageData, canvas } = processCanvas(image, obj, ctx);
+        return resizeCanvas(imageData, canvas);
+      })
+
+      const tensors = canvases.map(canvas =>{
+        return tf.browser.fromPixels(canvas, 1).toFloat().div(255.0);
       });
 
       const tensorData = tensors.map(tensor => ({
