@@ -252,9 +252,9 @@ const Captcha = () => {
 
       <div className="d-flex flex-wrap justify-content-center mb-5">
 
-        <button className="btn btn-success m-2 p-1 button" onClick={handleReset}>New</button>
+        <button className="btn btn-success mx-2 my-1 p-1 button" onClick={handleReset}>New</button>
 
-        <button className="btn btn-success m-2 p-1 button" onClick={handleClear}>Clear</button>
+        <button className="btn btn-success mx-2 my-1 p-1 button" onClick={handleClear}>Clear</button>
 
       </div>
 

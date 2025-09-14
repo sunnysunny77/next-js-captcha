@@ -62,6 +62,8 @@ h1 {
   cursor: crosshair;
   image-rendering: pixelated;
   z-index: 1;
+  touch-action: none;
+  -ms-touch-action: none;
 }
 
 #canvas-wrapper .after {
