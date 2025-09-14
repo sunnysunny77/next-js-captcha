@@ -5,7 +5,8 @@ import {getLabels, getClassify} from "@/lib/captcha";
 import Image from "next/image";
 import Spinner from "@/images/spinner.gif";
 
-const SIZE = 140;
+const CANVAS_WIDTH = 140;
+const CANVAS_HEIGHT = 140;
 const INVERT = false;
 
 const Captcha = () => {
@@ -38,9 +39,9 @@ const Captcha = () => {
     contextsRef.current.forEach(ctx => {
         if (INVERT) {
           ctx.fillStyle = "white";
-          ctx.fillRect(0, 0, SIZE, SIZE);
+          ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
         } else {
-          ctx.clearRect(0, 0, SIZE, SIZE)
+          ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
         }
     });
   }
@@ -58,8 +59,8 @@ const Captcha = () => {
   useEffect(() => {
     canvasesRef.current = Array.from(document.querySelectorAll(".quad"));
     contextsRef.current = canvasesRef!.current.map(canvas => {
-      canvas.width = SIZE;
-      canvas.height = SIZE;
+      canvas.width = CANVAS_WIDTH;
+      canvas.height = CANVAS_HEIGHT;
       const ctx = canvas.getContext("2d");
       return ctx;
     });
@@ -71,9 +72,9 @@ const Captcha = () => {
 
       if (INVERT) {
         ctx.fillStyle = "white";
-        ctx.fillRect(0, 0, SIZE, SIZE);
+        ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
       } else {
-        ctx.clearRect(0, 0, SIZE, SIZE);
+        ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
       }
 
       const onPointerDown = event => {
@@ -140,13 +141,13 @@ const Captcha = () => {
     setMessage("Draw a capital letter in the boxes");
   };
 
-  const resizeCanvas = (imageData, canvas) => {
-    let minX = SIZE, minY = SIZE;
+  const resizeCanvas = (imageData, obj) => {
+    let minX = CANVAS_WIDTH, minY = CANVAS_HEIGHT;
     let maxX = 0, maxY = 0;
 
-    for (let y = 0; y < SIZE; y++) {
-      for (let x = 0; x < SIZE; x++) {
-        const idx = (y * SIZE + x) * 4;
+    for (let y = 0; y < CANVAS_HEIGHT; y++) {
+      for (let x = 0; x < CANVAS_WIDTH; x++) {
+        const idx = (y * CANVAS_WIDTH + x) * 4;
         if (imageData[idx] > 0) {
           if (x < minX) minX = x;
           if (x > maxX) maxX = x;
@@ -168,7 +169,7 @@ const Captcha = () => {
     const resizedCtx = resizedCanvas.getContext("2d");
 
     resizedCtx.drawImage(
-      canvas,
+      obj,
       minX, minY, boxWidth, boxHeight,
       dx, dy, boxWidth * scale, boxHeight * scale
     );
@@ -176,25 +177,25 @@ const Captcha = () => {
     return resizedCanvas;
   };
 
-  const processCanvas = (image, obj, ctx) => {
-    if (INVERT) {
-      const invertedCanvas = document.createElement("canvas");
-      invertedCanvas.width = SIZE;
-      invertedCanvas.height = SIZE;
-      const invertedCtx = invertedCanvas.getContext("2d");
-      const invertedData = ctx.createImageData(image.width, image.height);
-      for (let i = 0; i < image.data.length; i += 4) {
-        invertedData.data[i]     = 255 - image.data[i];
-        invertedData.data[i + 1] = 255 - image.data[i + 1];
-        invertedData.data[i + 2] = 255 - image.data[i + 2];
-        invertedData.data[i + 3] = image.data[i + 3];
-      };
-      invertedCtx.putImageData(invertedData, 0, 0);
+  const invertCanvas = (ctx) => {
+    const image = ctx.getImageData(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-      return { imageData: invertedCtx.getImageData(0, 0, SIZE, SIZE).data, canvas: invertedCanvas };
-    }
+    const invertedCanvas = document.createElement("canvas");
+    invertedCanvas.width = CANVAS_WIDTH;
+    invertedCanvas.height = CANVAS_HEIGHT;
+    const invertedCtx = invertedCanvas.getContext("2d");
+    const invertedData = ctx.createImageData(image.width, image.height);
 
-    return { imageData:  image.data, canvas: obj };
+    for (let i = 0; i < image.data.length; i += 4) {
+      invertedData.data[i]     = 255 - image.data[i];
+      invertedData.data[i + 1] = 255 - image.data[i + 1];
+      invertedData.data[i + 2] = 255 - image.data[i + 2];
+      invertedData.data[i + 3] = image.data[i + 3];
+    };
+
+    invertedCtx.putImageData(invertedData, 0, 0);
+
+    return { imageData: invertedCtx.getImageData(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT).data, obj: invertedCanvas };
   };
 
   const handleSubmit = async () => {
@@ -202,11 +203,10 @@ const Captcha = () => {
       setDisabled(true);
       setMessage(null);
 
-      const canvases = canvasesRef.current.map((obj, i) => {
+      const canvases = canvasesRef.current.map((canvas, i) => {
         const ctx = contextsRef.current[i];
-        const image = ctx.getImageData(0, 0, SIZE, SIZE);
-        const { imageData, canvas } = processCanvas(image, obj, ctx);
-        return resizeCanvas(imageData, canvas);
+        const { imageData, obj } = INVERT ? invertCanvas(ctx) : { imageData: ctx.getImageData(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT).data, obj: canvas };
+        return resizeCanvas(imageData, obj);
       })
 
       const tensors = canvases.map(canvas =>{
