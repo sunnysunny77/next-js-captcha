@@ -31,8 +31,8 @@ const loadModel = async (): Promise<void> => {
 };
 
 const drawPhoneticLabel = (index) => {
-  const width = 122;
-  const height = 61;
+  const width = 140;
+  const height = 56;
   const fill = "white";
   const dotCount = 50;
   const lineStyle = "rgba(0,0,0,0.34)";

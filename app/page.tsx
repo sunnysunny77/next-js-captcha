@@ -4,7 +4,7 @@ const Home = () => {
 
   return (
 
-    <main className="mt-5">
+    <main className="d-flex justify-content-center">
 
       <Captcha  />
 

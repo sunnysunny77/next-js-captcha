@@ -236,9 +236,9 @@ const Captcha = () => {
 
     <div className="hr-container d-flex flex-column" id="container">
 
-      <h1 className="text-center mb-2">Handwritten recognition</h1>
+      <h1 className="text-center mb-4">Handwritten recognition</h1>
 
-      <div ref={quadRef} className="mb-4" id="canvas-wrapper">
+      <div ref={quadRef} className="mb-5 d-flex flex-wrap" id="canvas-wrapper">
 
         <div className="before"></div>
         <canvas className="quad"></canvas>
@@ -250,11 +250,11 @@ const Captcha = () => {
 
       </div>
 
-      <div className="d-flex flex-wrap justify-content-center mb-4">
+      <div className="d-flex flex-wrap justify-content-center mb-5">
 
-        <button className="btn btn-success m-2 button" onClick={handleReset}>New</button>
+        <button className="btn btn-success mx-2 p-1 button" onClick={handleReset}>New</button>
 
-        <button className="btn btn-success m-2 button" onClick={handleClear}>Clear</button>
+        <button className="btn btn-success mx-2 p-1 button" onClick={handleClear}>Clear</button>
 
       </div>
 
@@ -262,7 +262,7 @@ const Captcha = () => {
 
         <div className="label-grid">
 
-          {labels ? labels.map((label, i) => (<Image key={i} width="125" height="60" src={label} loader={imageLoader} unoptimized alt="canvas"/>)) : <Image className="spinner" width="70" height="70" src={Spinner} loader={imageLoader} unoptimized alt="spinner"/>}
+          {labels ? labels.map((label, i) => (<Image key={i} width="140" height="56" src={label} loader={imageLoader} unoptimized alt="canvas"/>)) : <Image className="spinner" width="70" height="70" src={Spinner} loader={imageLoader} unoptimized alt="spinner"/>}
 
         </div>
 
@@ -276,7 +276,7 @@ const Captcha = () => {
 
       <div className="d-flex flex-wrap justify-content-center">
 
-        <button className="btn btn-success w-100" disabled={disabled} onClick={handleSubmit} ref={predictBtnRef}>Send</button>
+        <button className="btn btn-success w-100 p-1" disabled={disabled} onClick={handleSubmit} ref={predictBtnRef}>Send</button>
 
       </div>
 

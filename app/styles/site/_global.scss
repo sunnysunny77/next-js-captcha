@@ -1,5 +1,8 @@
 html {
   -webkit-text-size-adjust: 100%;
+  height: 100%;
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: auto;
 }
 
 body {
@@ -29,23 +32,27 @@ body {
 h1 {
   font-size: clamp(17px, 2.5vw, 19px);
   color: $white;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }
 
 .hr-container {
-  max-width: 280px;
-  margin: 2rem auto;
+  max-width: 312px;
+  margin: 1rem;
   padding: 1rem;
   border-radius: 12px;
   user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
   background-color: $bravo;
 }
 
 #canvas-wrapper {
   position: relative;
-  display: flex;
-  flex-wrap: wrap;
   width: 100%;
-  max-width: 280px;
   aspect-ratio: 1 / 1;
 }
 
@@ -86,7 +93,7 @@ h1 {
 }
 
 .output-container {
-  aspect-ratio: 2 / 1;
+  aspect-ratio: 2.5 / 1;
   position: relative;
   border-radius: 5px;
   overflow: hidden;
