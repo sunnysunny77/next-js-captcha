@@ -1,5 +1,6 @@
 "use client";
 import * as tf from "@tensorflow/tfjs";
+import {ArrowRight} from "react-bootstrap-icons";
 import {useEffect, useRef, useState, useCallback} from "react";
 import {getLabels, getClassify} from "@/lib/captcha";
 import Image from "next/image";
@@ -250,19 +251,27 @@ const Captcha = () => {
 
       </div>
 
-      <div className="d-flex flex-wrap justify-content-evenly mb-5">
+      <div className="row justify-content-evenly mb-5 g-0">
 
-        <button className="btn button-small button btn-light mx-2 my-1 p-1 button" onClick={handleReset}>New</button>
+        <div className="col-32 col-sm-12 d-flex justify-content-center">
 
-        <button className="btn button-small button btn-light mx-2 my-1 p-1 button" onClick={handleClear}>Clear</button>
+          <button className="btn button button-small btn-light w-100 my-1 p-1 button" onClick={handleReset}>New</button>
+
+        </div>
+
+        <div className="col-32 col-sm-12 d-flex justify-content-center">
+
+          <button className="btn button button-small btn-light w-100 my-1 p-1 button" onClick={handleClear}>Clear</button>
+
+        </div>
 
       </div>
 
       <div className="output-container mb-3">
 
-        <div className="label-grid">
+        <div className="label-grid d-flex flex-wrap">
 
-          {labels ? labels.map((label, i) => (<Image key={i} width="140" height="56" src={label} loader={imageLoader} unoptimized alt="canvas"/>)) : <Image className="spinner" width="70" height="70" src={Spinner} loader={imageLoader} unoptimized alt="spinner"/>}
+          {labels ? labels.map((label, i) => (<Image key={i} width="140" height="56" src={label} loader={imageLoader} unoptimized alt="canvas"/>)) : <Image className="spinner" width="35" height="35" src={Spinner} loader={imageLoader} unoptimized alt="spinner"/>}
 
         </div>
 
@@ -270,13 +279,23 @@ const Captcha = () => {
 
       <div className="text-center alert w-100 d-flex justify-content-center align-items-center p-0 mb-3" role="alert">
 
-        {message ? message : <Image width="30" height="30" src={Spinner} loader={imageLoader} unoptimized alt="spinner"/>}
+        {message ? message : <Image width="35" height="35" src={Spinner} loader={imageLoader} unoptimized alt="spinner"/>}
 
       </div>
 
       <div className="d-flex flex-wrap justify-content-center">
 
-        <button className="btn button btn-light w-100 p-1" disabled={disabled} onClick={handleSubmit} ref={predictBtnRef}>Send</button>
+        <button className="btn button btn-light button-large w-100 d-flex flex-warp align-items-center justify-content-center p-1" disabled={disabled} onClick={handleSubmit}>
+
+          Send
+
+          <span className="d-flex flex-warp align-items-center justify-content-center ms-2">
+
+            <ArrowRight />
+
+          </span>
+
+        </button>
 
       </div>
 
